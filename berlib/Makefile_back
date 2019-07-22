@@ -1,0 +1,23 @@
+src = $(wildcard ./src/*.c)
+obj = $(patsubst ./src/%.c, ./obj/%.o, $(src))
+
+target = ALL
+inc_path = ./inc
+lib = libKeymng_msg.so
+
+ALL:$(target)
+
+#$(target):$(lib)
+#	gcc -shared -o $^ $(obj)
+
+$(target):$(obj)
+	#gcc $^ -o $@
+	echo "success"
+
+$(obj):./obj/%.o : ./src/%.c
+	gcc -c $< -o $@ -I $(inc_path)
+
+clean:
+	-rm -rf $(obj) $(target)
+
+.PHONY: clean ALL
