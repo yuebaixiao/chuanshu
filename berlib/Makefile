@@ -1,3 +1,4 @@
+
 src = $(wildcard ./src/*.c)
 test_src = $(wildcard ./test/*.c)
 obj = $(patsubst ./src/%.c, ./obj/%.o, $(src))
@@ -9,17 +10,13 @@ inc_path = ./inc
 ALL:$(target)
 
 $(target):$(obj) $(test_obj)
-	echo $(src)
-	gcc -o $@ $<
+	gcc -o $@ $^
 
-#$(obj):./obj/%.o : ./src/%.c 
-#	gcc -c $< -o $@ -I $(inc_path)
-
-$(obj): $(src)
+$(obj): ./obj/%.o : ./src/%.c ./inc/%.h
 	gcc -c $< -o $@ -I $(inc_path)
 
 
-$(test_obj): $(test_src) 
+$(test_obj): ./obj/%.o : ./test/%.c
 	gcc -c $< -o $@ -I $(inc_path)
 
 clean:
