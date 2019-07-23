@@ -26,8 +26,43 @@ int MsgReqEncode_(MsgKey_Req *pReq, ITCAST_ANYBUF **outData){
     DER_ITCAST_FreeQueue(pHeadBuf);
     return ret;
   }
+  
   pTmp = pTmp->next;
+  //AuthCode
+  ret = EncodeChar(pReq->AuthCode, strlen(pReq->AuthCode), &pTmp->next);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHeadBuf);
+    return ret;
+  }
+  
+  pTmp = pTmp->next;
+  //serverId
+  ret = EncodeChar(pReq->serverId, strlen(pReq->serverId), &pTmp->next);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHeadBuf);
+    return ret;
+  }
+  
+  pTmp = pTmp->next;
+  //r1
+  ret = EncodeChar(pReq->r1, strlen(pReq->r1), &pTmp->next);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHeadBuf);
+    return ret;
+  }
+
+  ret = DER_ItAsn1_WriteSequence(pHeadBuf, &pOutData);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHeadBuf); 
+    return ret;
+  }
+  
+  *outData = pOutData; 
+  DER_ITCAST_FreeQueue(pHeadBuf);
+
+  return ret;
 }
+
 int MsgEncode(void* pStruct , int type, unsigned char** outData, int* outLen){
 
   ITCAST_ANYBUF*pHeadbuf = NULL, *pTemp = NULL;

@@ -7,7 +7,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-/*
+
 int mywritefile(unsigned char *buf, int len){
   int fd = open("teacher.ber", O_WRONLY | O_CREAT, 0664);
   if (fd == -1){
@@ -19,6 +19,7 @@ int mywritefile(unsigned char *buf, int len){
   return 0;
 }
 
+/*
 void test(){
 
   MsgKey_Res req;
@@ -48,6 +49,7 @@ void test(){
 
   MsgMemFree(&ptr,type); 
 }
+*/
 void test1(){
   
   MsgKey_Req req;
@@ -76,8 +78,8 @@ void test1(){
   }
 
 }
-*/
+
 int main(int argc, char** argv){  
-  //test1();
+  test1();
   //test();
 }
