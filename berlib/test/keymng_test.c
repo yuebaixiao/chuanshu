@@ -18,7 +18,7 @@ int mywritefile(unsigned char *buf, int len){
   return 0;
 }
 
-/*
+
 void test(){
 
   MsgKey_Res req;
@@ -46,9 +46,9 @@ void test(){
     printf("seckeyid:%d\n", requ->seckeyid);
   }
 
-  MsgMemFree(&ptr,type); 
+  //MsgMemFree(&ptr,type); 
 }
-*/
+
 void test1(){
   
   MsgKey_Req req;
@@ -80,6 +80,6 @@ void test1(){
 }
 
 int main(int argc, char** argv){  
-  test1();
-  //test();
+  //test1();
+  test();
 }
