@@ -63,6 +63,89 @@ int MsgReqEncode_(MsgKey_Req *pReq, ITCAST_ANYBUF **outData){
   return ret;
 }
 
+int MsgKey_ReqDecode_(unsigned char* indata, int inLen, MsgKey_Req** pStruct){
+  int ret = 0;
+  ITCAST_ANYBUF* pTmp     = NULL;
+  ITCAST_ANYBUF* pHead    = NULL;
+  ITCAST_ANYBUF* pOutData = NULL;
+  ITCAST_ANYBUF* inAnyBuf = NULL;
+
+  MsgKey_Req* pTmpStru = NULL;
+
+  ret = DER_ITCAST_String_To_AnyBuf(&inAnyBuf, indata, inLen);
+  if (ret != 0){
+    return ret;
+  }
+
+  ret = DER_ItAsn1_ReadSequence(inAnyBuf, &pHead);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(inAnyBuf);
+    return ret;
+  }
+  DER_ITCAST_FreeQueue(inAnyBuf);
+
+  pTmpStru = (MsgKey_Req *)malloc(sizeof(MsgKey_Req));
+  if (pTmpStru == NULL){
+    ret = 3;
+    DER_ITCAST_FreeQueue(pHead);
+    return ret;
+  }
+  memset(pTmpStru, 0, sizeof(MsgKey_Req));
+
+  pTmp = pHead;
+
+  //cmdType
+  ret = DER_ItAsn1_ReadInteger(pTmp, (ITCAST_UINT32 *)&(pTmpStru->cmdType));
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHead);
+    return ret;
+  }
+  pTmp = pTmp->next;
+
+  //clientId
+  ret = DER_ItAsn1_ReadPrintableString(pTmp, &pOutData);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHead);
+    return ret;
+  }
+  memcpy(pTmpStru->clientId, pOutData->pData, pOutData->dataLen);
+  pTmp = pTmp->next; 
+  DER_ITCAST_FreeQueue(pOutData);
+
+  //AuthCode
+  ret = DER_ItAsn1_ReadPrintableString(pTmp, &pOutData);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHead);
+    return ret;
+  }
+  memcpy(pTmpStru->AuthCode, pOutData->pData, pOutData->dataLen);
+  pTmp = pTmp->next; 
+  DER_ITCAST_FreeQueue(pOutData);
+
+  //serverId
+  ret = DER_ItAsn1_ReadPrintableString(pTmp, &pOutData);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHead);
+    return ret;
+  }
+  memcpy(pTmpStru->serverId, pOutData->pData, pOutData->dataLen);
+  pTmp = pTmp->next; 
+  DER_ITCAST_FreeQueue(pOutData);
+
+  //r1
+  ret = DER_ItAsn1_ReadPrintableString(pTmp, &pOutData);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHead);
+    return ret;
+  }
+  memcpy(pTmpStru->r1, pOutData->pData, pOutData->dataLen);
+  pTmp = pTmp->next; 
+  DER_ITCAST_FreeQueue(pOutData);
+
+  *pStruct = pTmpStru;
+  return ret;
+}
+
 int MsgEncode(void* pStruct , int type, unsigned char** outData, int* outLen){
 
   ITCAST_ANYBUF*pHeadbuf = NULL, *pTemp = NULL;
@@ -122,6 +205,53 @@ int MsgEncode(void* pStruct , int type, unsigned char** outData, int* outLen){
   *outLen = pOutData->dataLen;
 
   DER_ITCAST_FreeQueue(pOutData);
+
+  return ret;
+}
+
+int MsgDecode(unsigned char* inData, int inLen, void** pStruct, int* type){
+
+  ITCAST_ANYBUF* pHeadBuf = NULL;
+  ITCAST_ANYBUF* inAnyBuf = NULL;
+  int ret = 0;
+  unsigned long	itype = 0;
+
+  ret = DER_ITCAST_String_To_AnyBuf(&inAnyBuf, inData, inLen);
+  if (ret != 0){
+    return ret;
+  }
+
+  ret = DER_ItAsn1_ReadSequence(inAnyBuf, &pHeadBuf);
+  if (ret != 0){
+    return ret;
+  }
+  DER_ITCAST_FreeQueue(inAnyBuf);
+
+  ret = DER_ItAsn1_ReadInteger(pHeadBuf, &itype);
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHeadBuf); 
+    return ret;
+  }
+
+  switch (itype){
+  case ID_MsgKey_Req:
+    ret = MsgKey_ReqDecode_(pHeadBuf->next->pData, pHeadBuf->next->dataLen, (MsgKey_Req **)pStruct);
+    break;
+  case ID_MsgKey_Res:
+
+    break;
+  default:
+    ret = KeyMng_TypeErr;
+    break;
+  }
+
+  if (ret != 0){
+    DER_ITCAST_FreeQueue(pHeadBuf);
+    return ret;
+  }
+
+  *type = itype;
+  DER_ITCAST_FreeQueue(pHeadBuf);
 
   return ret;
 }

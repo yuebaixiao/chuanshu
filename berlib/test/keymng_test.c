@@ -7,7 +7,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-
 int mywritefile(unsigned char *buf, int len){
   int fd = open("teacher.ber", O_WRONLY | O_CREAT, 0664);
   if (fd == -1){
@@ -65,6 +64,7 @@ void test1(){
   MsgEncode(&req, ID_MsgKey_Req, &myOut, &myOutlen);
   mywritefile(myOut, myOutlen);
 
+  
   void* ptr;
   int type;
   MsgDecode(myOut, myOutlen, &ptr, &type);
@@ -76,7 +76,7 @@ void test1(){
     printf("ser:%s\n", requ->serverId);
     printf("r1:%s\n", requ->r1);
   }
-
+  
 }
 
 int main(int argc, char** argv){  
