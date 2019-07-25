@@ -46,7 +46,7 @@ void test(){
     printf("seckeyid:%d\n", requ->seckeyid);
   }
 
-  //MsgMemFree(&ptr,type); 
+  MsgMemFree(&ptr,type); 
 }
 
 void test1(){
@@ -76,10 +76,12 @@ void test1(){
     printf("ser:%s\n", requ->serverId);
     printf("r1:%s\n", requ->r1);
   }
+
+  MsgMemFree(&ptr,type); 
   
 }
 
 int main(int argc, char** argv){  
-  //test1();
+  test1();
   test();
 }

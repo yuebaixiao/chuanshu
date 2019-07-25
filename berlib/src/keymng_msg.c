@@ -393,3 +393,51 @@ int MsgDecode(unsigned char* inData, int inLen, void** pStruct, int* type){
 
   return ret;
 }
+
+int MsgKey_Res_Free(MsgKey_Res** pStruct){
+  MsgKey_Res* tmp = NULL;
+
+  tmp = *pStruct;
+
+  if (tmp != NULL){
+    free(tmp);
+  }
+  *pStruct = NULL;
+  return 0;
+}
+
+int MsgKey_Req_Free(MsgKey_Req** pStruct){
+  MsgKey_Req* tmp = NULL;
+
+  tmp = *pStruct;
+
+  if (tmp != NULL){
+    free(tmp);
+  }
+  *pStruct = NULL;
+  return 0;
+}
+int MsgMemFree(void **point,int type){
+  if (point == NULL){
+    return 0;
+  }
+
+  if (type == 0){ 
+    if (*point) free(*point);
+    *point = NULL;
+    return 0;
+  }
+
+  switch (type){
+  case ID_MsgKey_Req:
+    MsgKey_Req_Free((MsgKey_Req**)point);
+    break;
+  case ID_MsgKey_Res:
+    MsgKey_Res_Free((MsgKey_Res**)point);
+    break;
+  default:
+    break;
+  }
+
+  return 0;
+}

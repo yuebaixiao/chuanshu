@@ -1,32 +1,27 @@
+src = $(wildcard ./src/*.c)
+obj = $(patsubst ./src/%.c, ./obj/%.o, $(src))
 
-	
 .PHONY:clean
 
 WORKDIR=.
 
-VPATH = ./src
-
-LIBOBJS=  socketutil.o poolsocket.o  socketlog.o
 LIB1 = libitcastsocket.so
 
 CC = gcc
 CFLGS= -Wall -g -I$(WORKDIR)/inc/
-LIBFLAG = -L$(HOME)/lib
 
 all: $(LIB1) 
 
 
-$(LIB1):$(LIBOBJS)
-	$(CC) -shared -fPIC $^ -o $@ 
-	cp  $(LIB1) $(HOME)/lib
+$(LIB1):$(obj)
+	$(CC) -shared -fPIC $^ -o $@
 	mv  $(LIB1) ./lib
 
-.c.o:
-	$(CC) $(CFLGS) -c $< -o $@  -shared -fPIC
-	
+$(obj): ./obj/%.o : ./src/%.c ./inc/%.h
+	gcc -c $< -o $@ $(CFLGS) -shared -fPIC
+
 clean:
-	rm -rf $(BIN) *.o $(HOME)/lib/$(LIB1) ./$(LIB1) 
-		
+	rm -rf $(obj) ./lib/$(LIB1) 
 
 
 
