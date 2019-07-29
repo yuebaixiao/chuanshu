@@ -121,8 +121,7 @@ static void ITCAST_Error_Core(const char *file, int line, int level, int status,
     return ;
 }
 
-
-void Socket_Log(const char *file, int line, int level, int status, const char *fmt, ...)
+void KeyMng_Log(const char *file, int line, int level, int status, const char *fmt, ...)
 {
     va_list args;
 	

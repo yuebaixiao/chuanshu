@@ -156,64 +156,56 @@ int deactivate_nonblock(int fd)
  */
 static int connect_timeout(int fd, struct sockaddr_in *addr, unsigned int wait_seconds)
 {
-	int ret;
-	socklen_t addrlen = sizeof(struct sockaddr_in);
+  int ret;
+  socklen_t addrlen = sizeof(struct sockaddr_in);
 
-	if (wait_seconds > 0)
-		activate_nonblock(fd);
+  if (wait_seconds > 0)
+    activate_nonblock(fd);
 
-	ret = connect(fd, (struct sockaddr*)addr, addrlen);
-	if (ret < 0 && errno == EINPROGRESS)
-	{
-		//printf("11111111111111111111\n");
-		fd_set connect_fdset;
-		struct timeval timeout;
-		FD_ZERO(&connect_fdset);
-		FD_SET(fd, &connect_fdset);
-		timeout.tv_sec = wait_seconds;
-		timeout.tv_usec = 0;
-		do
-		{
-			// 一但连接建立，则套接字就可写  所以connect_fdset放在了写集合中
-			ret = select(fd + 1, NULL, &connect_fdset, NULL, &timeout);
-		} while (ret < 0 && errno == EINTR);
-		if (ret == 0)
-		{
-			ret = -1;
-			errno = ETIMEDOUT;
-		}
-		else if (ret < 0)
-			return -1;
-		else if (ret == 1)
-		{
-			//printf("22222222222222222\n");
-			/* ret返回为1（表示套接字可写），可能有两种情况，一种是连接建立成功，一种是套接字产生错误，*/
-			/* 此时错误信息不会保存至errno变量中，因此，需要调用getsockopt来获取。 */
-			int err;
-			socklen_t socklen = sizeof(err);
-			int sockoptret = getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &socklen);
-			if (sockoptret == -1)
-			{
-				return -1;
-			}
-			if (err == 0)
-			{
-				//printf("3333333333333\n");
-				ret = 0;
-			}
-			else
-			{
-				//printf("4444444444444444:%d\n", err);
-				errno = err;
-				ret = -1;
-			}
-		}
-	}
-	if (wait_seconds > 0)
-	{
-		deactivate_nonblock(fd);
-	}
-	return ret;
+  ret = connect(fd, (struct sockaddr*)addr, addrlen);
+  if (ret < 0 && errno == EINPROGRESS){
+    //printf("11111111111111111111\n");
+    fd_set connect_fdset;
+    struct timeval timeout;
+    FD_ZERO(&connect_fdset);
+    FD_SET(fd, &connect_fdset);
+    timeout.tv_sec = wait_seconds;
+    timeout.tv_usec = 0;
+    do{
+      // 一但连接建立，则套接字就可写  所以connect_fdset放在了写集合中
+      ret = select(fd + 1, NULL, &connect_fdset, NULL, &timeout);
+    } while (ret < 0 && errno == EINTR);
+    if (ret == 0){
+      ret = -1;
+      errno = ETIMEDOUT;
+    }
+    else if (ret < 0)
+      return -1;
+    else if (ret == 1){
+      //printf("22222222222222222\n");
+      /* ret返回为1（表示套接字可写），可能有两种情况，一种是连接建立成功，一种是套接字产生错误，*/
+      /* 此时错误信息不会保存至errno变量中，因此，需要调用getsockopt来获取。 */
+      int err;
+      socklen_t socklen = sizeof(err);
+      int sockoptret = getsockopt(fd, SOL_SOCKET, SO_ERROR, &err, &socklen);
+      if (sockoptret == -1){
+	return -1;
+      }
+      if (err == 0){
+	//printf("3333333333333\n");
+	ret = 0;
+      }
+      else{
+	//printf("4444444444444444:%d\n", err);
+	errno = err;
+	ret = -1;
+      }
+    }
+  }
+  if (wait_seconds > 0){
+    deactivate_nonblock(fd);
+  }
+  return ret;
 }
 
 
@@ -620,10 +612,12 @@ int accept_timeout(int fd, struct sockaddr_in *addr, unsigned int wait_seconds)
 
 	//一但检测出 有select事件发生，表示对等方完成了三次握手，客户端有新连接建立
 	//此时再调用accept将不会堵塞
-	if (addr != NULL)
+	if (addr != NULL){
 		ret = accept(fd, (struct sockaddr*)addr, &addrlen); //返回已连接套接字
-	else
-		ret = accept(fd, NULL, NULL);
+	}
+	else{
+	  ret = accept(fd, NULL, NULL);
+	}
 		if (ret == -1)
 		{
 			ret = errno;
